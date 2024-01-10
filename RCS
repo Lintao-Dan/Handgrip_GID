@@ -1,0 +1,330 @@
+library(rms)
+Grip_inc_rms <- datadist(Grip_inc0) 
+options(datadist='Grip_inc_rms') 
+
+
+#
+RCS_model <- function(data,Time1,Time2,Outcome, mode=1){
+  if (mode == 0){
+    model <-cph(Surv(Time1,Time2,Outcome)~rcs(grip_sd,3)+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat
+                +cci_index+EduCat+Diet,data=Grip_inc0)
+    Grip_inc_rms$limits$grip_sd[2] <- 0
+    model = update(model)
+    HR <-Predict(model,grip_sd,fun=exp,ref.zero = TRUE)
+    HR<-HR[,c('grip_sd','yhat','lower','upper')]
+    
+  }
+  else if (mode == 1){
+    model <-cph(Surv(Time1,Time2,Outcome)~rcs(muscle_sd,3)+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat
+                +cci_index+EduCat+Diet,data=Grip_inc0)
+    Grip_inc_rms$limits$muscle_sd[2] <- 0
+    model = update(model)
+    HR <-Predict(model,muscle_sd,fun=exp,ref.zero = TRUE)
+    HR<-HR[,c('muscle_sd','yhat','lower','upper')]
+    
+  }
+  
+  else{
+    model = NULL
+    print("Warning: Model not find")
+  }
+  return(HR)
+}
+
+GI_RCS <-function(data=Null,mode=mode){
+  Append<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Append_cat,Time1=data$Append_agestart,Time2=data$Append_ageend,mode = mode)
+  Cirrhosis<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Cirrhosis_cat,Time1=data$Cirrhosis_agestart,Time2=data$Cirrhosis_ageend,mode = mode)
+  Diverticulum<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Diverticulum_cat,Time1=data$Diverticulum_agestart,Time2=data$Diverticulum_ageend,mode = mode)
+  Cholangitis<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Cholangitis_cat,Time1=data$Cholangitis_agestart,Time2=data$Cholangitis_ageend,mode = mode)
+  Cholecystitis<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Cholecystitis_cat,Time1=data$Cholecystitis_agestart,Time2=data$Cholecystitis_ageend,mode = mode)
+  PancreaChron<-RCS_model(data=data,Exposure=Exposure,Outcome = data$PancreaChron_cat,Time1=data$PancreaChron_agestart,Time2=data$PancreaChron_ageend,mode = mode)
+  PancreaAcute<-RCS_model(data=data,Exposure=Exposure,Outcome = data$PancreaAcute_cat,Time1=data$PancreaAcute_agestart,Time2=data$PancreaAcute_ageend,mode = mode)
+  UC<-RCS_model(data=data,Exposure=Exposure,Outcome = data$UC_cat,Time1=data$UC_agestart,Time2=data$UC_ageend,mode = mode)
+  CD<-RCS_model(data=data,Exposure=Exposure,Outcome = data$CD_cat,Time1=data$CD_agestart,Time2=data$CD_ageend,mode = mode)
+  IBS<-RCS_model(data=data,Exposure=Exposure,Outcome = data$IBS_cat,Time1=data$IBS_agestart,Time2=data$IBS_ageend,mode = mode)
+  Celiac<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Celiac_cat,Time1=data$Celiac_agestart,Time2=data$Celiac_ageend,mode = mode)
+  Gastritis<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Gastritis_cat,Time1=data$Gastritis_agestart,Time2=data$Gastritis_ageend,mode = mode)
+  Ulcer<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Ulcer_cat,Time1=data$Ulcer_agestart,Time2=data$Ulcer_ageend,mode = mode)
+  Barrett<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Barrett_cat,Time1=data$Barrett_agestart,Time2=data$Barrett_ageend,mode = mode)
+  GERD<-RCS_model(data=data,Exposure=Exposure,Outcome = data$GERD_cat,Time1=data$GERD_agestart,Time2=data$GERD_ageend,mode = mode)
+  Esopha<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Esopha_cat,Time1=data$Esopha_agestart,Time2=data$Esopha_ageend,mode = mode)
+  Gastric<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Gastric_cat,Time1=data$Gastric_agestart,Time2=data$Gastric_ageend,mode = mode)
+  IntestSmall<-RCS_model(data=data,Exposure=Exposure,Outcome = data$IntestSmall_cat,Time1=data$IntestSmall_agestart,Time2=data$IntestSmall_ageend,mode = mode)
+  CRC<-RCS_model(data=data,Exposure=Exposure,Outcome = data$CRC_cat,Time1=data$CRC_agestart,Time2=data$CRC_agestart,Time2=data$CRC_ageend,mode = mode)
+  Pancrea<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Pancrea_cat,Time1=data$Pancrea_agestart,Time2=data$Pancrea_agestart,Time2=data$Pancrea_ageend,mode = mode)
+  Gallbladder<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Gallbladder_cat,Time1=data$Gallbladder_agestart,Time2=data$Gallbladder_ageend,mode = mode)
+  NAFLD<-RCS_model(data=data,Exposure=Exposure,Outcome = data$NAFLD_cat,Time1=data$NAFLD_agestart,Time2=data$NAFLD_ageend,mode = mode)
+  HCC<-RCS_model(data=data,Exposure=Exposure,Outcome = data$HCC_cat,Time1=data$HCC_agestart,Time2=data$HCC_ageend,mode = mode)
+  Cholelithiasis<-RCS_model(data=data,Exposure=Exposure,Outcome = data$Cholelithiasis_cat,Time1=data$Cholelithiasis_agestart,Time2=data$Cholelithiasis_ageend,mode = mode)
+  Model<-cbind.data.frame(Barrett,GERD,Esopha,
+                          Gastritis,Celiac,CD,UC,Diverticulum,IBS,Ulcer,Gastric,IntestSmall,CRC, 
+                          PancreaAcute,PancreaChron,Pancrea,
+                          Cholangitis,Cholecystitis,Cholelithiasis,Gallbladder ,
+                          NAFLD,Cirrhosis, HCC,Append)
+  colnames(Model)<-c('Barrett','Barrett_HR','Barrett_LCL','Barrett_UCL',
+                     'GERD','GERD_HR','GERD_LCL','GERD_UCL',
+                     'Esopha','Esopha_HR','Esopha_LCL','Esopha_UCL',
+                     'Gastritis','Gastritis_HR','Gastritis_LCL','Gastritis_UCL',
+                     'Celiac','Celiac_HR','Celiac_LCL','Celiac_UCL',
+                     'CD','CD_HR','CD_LCL','CD_UCL',
+                     'UC','UC_HR','UC_LCL','UC_UCL',
+                     'Diverticulum','Diverticulum_HR','Diverticulum_LCL','Diverticulum_UCL',
+                     'IBS','IBS_HR','IBS_LCL','IBS_UCL',
+                     'Ulcer','Ulcer_HR','Ulcer_LCL','Ulcer_UCL',
+                     'Gastric','Gastric_HR','Gastric_LCL','Gastric_UCL',
+                     'IntestSmall','IntestSmall_HR','IntestSmall_LCL','IntestSmall_UCL',
+                     'CRC','CRC_HR','CRC_LCL','CRC_UCL',
+                     'PancreaAcute','PancreaAcute_HR','PancreaAcute_LCL','PancreaAcute_UCL',
+                     'PancreaChron','PancreaChron_HR','PancreaChron_LCL','PancreaChron_UCL',
+                     'Pancrea','Pancrea_HR','Pancrea_LCL','Pancrea_UCL',
+                     'Cholangitis','Cholangitis_HR','Cholangitis_LCL','Cholangitis_UCL',
+                     'Cholecystitis','Cholecystitis_HR','Cholecystitis_LCL','Cholecystitis_UCL',
+                     'Cholelithiasis','Cholelithiasis_HR','Cholelithiasis_LCL','Cholelithiasis_UCL',
+                     'Gallbladder','Gallbladder_HR','Gallbladder_LCL','Gallbladder_UCL',
+                     'NAFLD','NAFLD_HR','NAFLD_LCL','NAFLD_UCL',
+                     'Cirrhosis','Cirrhosis_HR','Cirrhosis_LCL','Cirrhosis_UCL',
+                     'HCC','HCC_HR','HCC_LCL','HCC_UCL',
+                     'Append','Append_HR','Append_LCL','Append_UCL'
+                     
+                     
+  )
+  return(as.data.frame(Model))
+}
+HR_grip<-GI_RCS(Grip_inc0,mode = 0)
+HR_muscle<-GI_RCS(Grip_inc0,mode = 1)
+setDF(HR_grip)
+setDF(HR_muscle)
+a<-seq(from=1,to=93,by=4)
+for (i in a) {
+  x<-which(HR_grip[,i]< -3.5|HR_grip[,i]>3.5)
+  HR_grip[x,i]<-NA
+  HR_grip[x,i+1]<-NA
+  HR_grip[x,i+2]<-NA
+  HR_grip[x,i+3]<-NA
+}
+for (i in a) {
+  x<-which(HR_muscle[,i]< -3.5|HR_muscle[,i]>3.5)
+  HR_muscle[x,i]<-NA
+  HR_muscle[x,i+1]<-NA
+  HR_muscle[x,i+2]<-NA
+  HR_muscle[x,i+3]<-NA
+}
+
+HR_grip$exposure<-'Grip'
+HR_muscle$exposure<-'Muscle mass'
+HR_GI<-rbind(HR_grip,HR_muscle)
+
+
+PIC <- function(a,b){
+  data1<-HR_GI[,c(a:b,97)]
+  data2<-HR_grip[,c(a:b)]
+  data3<-HR_muscle[,c(a:b)]
+  P<-ggplot()+theme_classic()+
+    geom_line(data=data1, aes(data1[,1],data1[,2],colour = factor(exposure)), alpha=3)+
+    geom_line(data=data1, aes(data1[,1],data1[,3],colour = factor(exposure)), alpha=1,linetype='longdash')+
+    geom_line(data=data1, aes(data1[,1],data1[,4],colour = factor(exposure)), alpha=1,linetype='longdash')+
+    scale_x_continuous(breaks =c(-3,-2,-1,0,1,2,3),labels = c("-3SD",'-2SD','-1SD','Mean','+1SD','+2SD','+3SD')) +
+        guides(color = guide_legend(override.aes = list(size = 3)))+
+    geom_ribbon(data=data2, aes(data2[,1], ymax=data2[,4],ymin=data2[,3]),fill='skyblue',alpha=0.2)+
+    geom_ribbon(data=data3, aes(data3[,1], ymax=data3[,4],ymin=data3[,3]),fill='grey',alpha=0.2)+
+    xlab("Exposure ") +
+    ylab("HR (95% CI)") +
+    ggtitle(label = 'A.')+
+    geom_hline(yintercept=1,size=0.5,linetype=2) + 
+    theme(plot.title = element_text(size = 27, face = "bold", hjust = 0,family='serif'),
+          axis.title.x = element_text(size = 27, face = "bold",family='serif',),
+          axis.title.y = element_text(size = 27, face = "bold",family='serif'),
+          axis.text.x = element_text(size = 27,family='serif',face = "bold",colour = 'black'),
+          axis.text.y = element_text(size = 27,family='serif',face = "bold",colour = 'black'),
+          legend.justification=c(1,0), # legend position
+          legend.position=c(1,0.8),
+          legend.title = element_text(size = 27,family='serif',face = "bold"),
+          legend.text = element_text(size = 27,family='serif'))  # Position legend in bottom right
+  return(P)
+}
+P_Barrett<-PIC(a=1,b=4)
+P_Barrett
+P_GERD<-PIC(a=5,b=8)
+P_GERD
+P_Esopha<-PIC(9,12)
+P_Esopha
+P_Gastritis<-PIC(13,16)
+P_Gastritis
+P_Celiac<-PIC(17,20)
+P_Celiac
+P_CD<-PIC(a=21,24)
+P_CD
+P_UC<-PIC(25,28)
+P_UC
+P_Diverticulum<-PIC(29,32)
+P_Diverticulum
+
+
+P_IBS<-PIC(33,36)
+P_IBS
+P_Ulcer<-PIC(37,40)
+P_Ulcer
+P_Gastric<-PIC(41,44)
+P_Gastric
+P_IntestSmall<-PIC(45,48)
+P_IntestSmall
+P_CRC<-PIC(a=49,b=52)
+P_CRC
+
+P_PancreaAcute<-PIC(a=53,b=56)
+P_PancreaAcute
+P_PancreaChron<-PIC(a=57,b=60)
+P_PancreaChron
+P_Pancrea<-PIC(a=61,b=64)
+P_Pancrea
+P_Cholangitis<-PIC(a=65,b=68)
+P_Cholangitis
+P_Cholecystitis<-PIC(a=69,b=72)
+P_Cholecystitis
+P_Cholelithiasis<-PIC(a=73,b=76)
+P_Cholelithiasis
+P_Gallbladder<-PIC(a=77,b=80)
+P_Gallbladder
+P_NAFLD<-PIC(a=81,b=84)
+P_NAFLD
+P_Cirrhosis<-PIC(a=85,b=88)
+P_Cirrhosis
+P_HCC<-PIC(89,92)
+P_HCC
+P_Append<-PIC(93,96)
+P_Append
+
+
+
+P_GI<-ggarrange(P_Barrett,P_GERD,P_Esopha,
+                P_Gastritis,P_Celiac,P_CD,P_UC,P_Diverticulum,P_IBS,P_Ulcer,P_Gastric,P_IntestSmall,P_CRC, 
+                P_PancreaAcute,P_PancreaChron,P_Pancrea,
+                P_Cholangitis,P_Cholecystitis,P_Cholelithiasis,P_Gallbladder ,
+                P_NAFLD,P_Cirrhosis, P_HCC,P_Append,ncol = 3,nrow = 8)
+pdf(file ='P_GI.pdf',height = 40, width = 25)
+plot(P_GI)
+dev.off()
+
+model <-cph(Surv(Barrett_time,Barrett_cat)~rcs(grip_sd,3)+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat
+            +cci_index+EduCat+Diet,data=Grip_inc0)
+data<-anova(model)
+data<-as.data.frame(data)
+data<-data[2:2,]
+Nonlinearity <- function(data,Time1,Time2,Outcome, mode=1){
+  if (mode == 0){
+    model <-cph(Surv(Time1,Time2,Outcome)~rcs(grip_sd,3)+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat
+                +cci_index+EduCat+Diet,data=Grip_inc0)
+    data<-anova(model)
+    data<-as.data.frame(data)
+    data<-data[2:2,]
+    
+  }
+  else if (mode == 1){
+    model <-cph(Surv(Time1,Time2,Outcome)~rcs(muscle_sd,3)+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat
+                +cci_index+EduCat+Diet,data=Grip_inc0)
+    data<-anova(model)
+    data<-as.data.frame(data)
+    data<-data[2:2,]
+    
+  }
+  
+  else{
+    model = NULL
+    print("Warning: Model not find")
+  }
+  return(data)
+}
+
+GI_Non <-function(data=Null,mode=mode){
+  Append<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Append_cat,Time1=data$Append_agestart,Time2=data$Append_ageend,mode = mode)
+  Cirrhosis<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Cirrhosis_cat,Time1=data$Cirrhosis_agestart,Time2=data$Cirrhosis_ageend,mode = mode)
+  Diverticulum<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Diverticulum_cat,Time1=data$Diverticulum_agestart,Time2=data$Diverticulum_ageend,mode = mode)
+  Cholangitis<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Cholangitis_cat,Time1=data$Cholangitis_agestart,Time2=data$Cholangitis_ageend,mode = mode)
+  Cholecystitis<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Cholecystitis_cat,Time1=data$Cholecystitis_agestart,Time2=data$Cholecystitis_ageend,mode = mode)
+  PancreaChron<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$PancreaChron_cat,Time1=data$PancreaChron_agestart,Time2=data$PancreaChron_ageend,mode = mode)
+  PancreaAcute<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$PancreaAcute_cat,Time1=data$PancreaAcute_agestart,Time2=data$PancreaAcute_ageend,mode = mode)
+  UC<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$UC_cat,Time1=data$UC_agestart,Time2=data$UC_ageend,mode = mode)
+  CD<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$CD_cat,Time1=data$CD_agestart,Time2=data$CD_ageend,mode = mode)
+  IBS<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$IBS_cat,Time1=data$IBS_agestart,Time2=data$IBS_ageend,mode = mode)
+  Celiac<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Celiac_cat,Time1=data$Celiac_agestart,Time2=data$Celiac_ageend,mode = mode)
+  Gastritis<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Gastritis_cat,Time1=data$Gastritis_agestart,Time2=data$Gastritis_ageend,mode = mode)
+  Ulcer<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Ulcer_cat,Time1=data$Ulcer_agestart,Time2=data$Ulcer_ageend,mode = mode)
+  Barrett<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Barrett_cat,Time1=data$Barrett_agestart,Time2=data$Barrett_ageend,mode = mode)
+  GERD<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$GERD_cat,Time1=data$GERD_agestart,Time2=data$GERD_ageend,mode = mode)
+  Esopha<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Esopha_cat,Time1=data$Esopha_agestart,Time2=data$Esopha_ageend,mode = mode)
+  Gastric<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Gastric_cat,Time1=data$Gastric_agestart,Time2=data$Gastric_ageend,mode = mode)
+  IntestSmall<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$IntestSmall_cat,Time1=data$IntestSmall_agestart,Time2=data$IntestSmall_ageend,mode = mode)
+  CRC<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$CRC_cat,Time1=data$CRC_agestart,Time2=data$CRC_agestart,Time2=data$CRC_ageend,mode = mode)
+  Pancrea<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Pancrea_cat,Time1=data$Pancrea_agestart,Time2=data$Pancrea_agestart,Time2=data$Pancrea_ageend,mode = mode)
+  Gallbladder<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Gallbladder_cat,Time1=data$Gallbladder_agestart,Time2=data$Gallbladder_ageend,mode = mode)
+  NAFLD<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$NAFLD_cat,Time1=data$NAFLD_agestart,Time2=data$NAFLD_ageend,mode = mode)
+  HCC<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$HCC_cat,Time1=data$HCC_agestart,Time2=data$HCC_ageend,mode = mode)
+  Cholelithiasis<-Nonlinearity(data=data,Exposure=Exposure,Outcome = data$Cholelithiasis_cat,Time1=data$Cholelithiasis_agestart,Time2=data$Cholelithiasis_ageend,mode = mode)
+  Model<-rbind.data.frame(Barrett,GERD,Esopha,
+                          Gastritis,Celiac,CD,UC,Diverticulum,IBS,Ulcer,Gastric,IntestSmall,CRC, 
+                          PancreaAcute,PancreaChron,Pancrea,
+                          Cholangitis,Cholecystitis,Cholelithiasis,Gallbladder ,
+                          NAFLD,Cirrhosis, HCC,Append)
+  rownames(Model)<-c('Barrett',
+                     'GERD',
+                     'Esopha',
+                     'Gastritis',
+                     'Celiac',
+                     'CD',
+                     'UC',
+                     'Diverticulum',
+                     'IBS',
+                     'Ulcer',
+                     'Gastric',
+                     'IntestSmall',
+                     'CRC',
+                     'PancreaAcute',
+                     'PancreaChron',
+                     'Pancrea',
+                     
+                     'Cholangitis',
+                     'Cholecystitis',
+                     'Cholelithiasis',
+                     'Gallbladder',
+                     'NAFLD',
+                     'Cirrhosis',
+                     'HCC',
+                     'Append'
+  )
+  return(as.data.frame(Model))
+}
+Non_grip<-GI_Non(Grip_inc0,mode = 0)
+Non_muscle<-GI_Non(Grip_inc0,mode = 1)
+
+Non_grip$Q_value<-p.adjust(Non_grip$P,method = 'BH')
+Non_muscle$Q_value<-p.adjust(Non_muscle$P,method = 'BH')
+Nonlinearity<-cbind(Non_grip,Non_muscle)
+Nonlinearity<-Nonlinearity[,c(1,4,8)]
+colnames(Nonlinearity)<-c('Disease','Grip','Muscle')
+Nonlinearity$Disease<-c('Barrett',
+                        'GERD',
+                        'Esopha',
+                        'Gastritis',
+                        'Celiac',
+                        'CD',
+                        'UC',
+                        'Diverticulum',
+                        'IBS',
+                        'Ulcer',
+                        'Gastric',
+                        'IntestSmall',
+                        'CRC',
+                        'PancreaAcute',
+                        'PancreaChron',
+                        'Pancrea',
+                        
+                        'Cholangitis',
+                        'Cholecystitis',
+                        'Cholelithiasis',
+                        'Gallbladder',
+                        'NAFLD',
+                        'Cirrhosis',
+                        'HCC',
+                        'Append'
+)
+write_csv(Nonlinearity,'nonlinearity.csv')
