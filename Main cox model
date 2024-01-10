@@ -1,0 +1,220 @@
+
+cox_model <- function(data,Time1,Time2,Outcome,Exposure, mode=1){
+  if (mode == 0){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure,data=data)
+    model <- ShowRegTable(model,printToggle=FALSE,pDigits = 50)
+    model<-as.data.frame(model)
+  }
+  else if (mode == 1){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure+Sex+AgeRec+EthCat,data=data)
+    model <- ShowRegTable(model,printToggle=FALSE,pDigits = 50)
+    model<-as.data.frame(model)
+  }
+  else if (mode == 2){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat+Diet
+                   ,data=data)
+    model <- ShowRegTable(model,printToggle=FALSE,pDigits = 50)
+    model<-as.data.frame(model)
+  }
+  else if (mode == 3){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure+Sex+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat+Diet
+                   ,data=data)
+    model <- ShowRegTable(model,printToggle=FALSE,pDigits = 50)
+    model<-as.data.frame(model)
+  }
+  else if (mode == 4){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat+Diet
+                   ,data=data)
+    model <- ShowRegTable(model,printToggle=FALSE,pDigits = 50)
+    model<-as.data.frame(model)
+  }
+  else if (mode == 5){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure+Sex+AgeRec+EthCat+TDI+PACat+EverSmokeCat+cci_index+EduCat+Diet
+                   ,data=data)
+    model <- ShowRegTable(model,printToggle=FALSE,pDigits = 50)
+    model<-as.data.frame(model)
+  }
+  else if (mode == 6){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+cci_index+EduCat+Diet
+                   ,data=data)
+    model <- ShowRegTable(model,printToggle=FALSE,pDigits = 50)
+    model<-as.data.frame(model)
+  }
+  else if (mode == 7){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat
+                   ,data=data)
+    model <- ShowRegTable(model,printToggle=FALSE,pDigits = 50)
+    model<-as.data.frame(model)
+  }
+  else if (mode == 8){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat+Diet+CRP
+                   ,data=data)
+    model <- ShowRegTable(model,printToggle=FALSE,pDigits = 50)
+    model<-as.data.frame(model)
+  }
+  else if (mode == 9){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat+Diet+INFLA
+                   ,data=data)
+    model <- ShowRegTable(model,printToggle=FALSE,pDigits = 50)
+    model<-as.data.frame(model)
+  }
+  else{
+    model = NULL
+    print("Warning: Model not find")
+  }
+  return(model)
+}
+
+Adjust <-function(data){
+  data$p<-gsub('[ ]','',data$p)
+  data$Q_value<-p.adjust(data$p,method = 'BH')
+  data$Q_value<-round(data$Q_value,3)
+  data$Q_value[which(data$Q_value==0)]<-'<0.001'
+  data<-data[,c('exp(coef) [confint]','Q_value')]
+  return(as.data.frame(data))
+}
+GI_cox <-function(data=Null,mode=mode,Exposure=Exposure){
+  Append<-cox_model(data=data,Exposure=Exposure,Outcome = data$Append_cat,Time1=data$Append_agestart,Time2=data$Append_ageend,mode = mode)[1:2,]
+  Cirrhosis<-cox_model(data=data,Exposure=Exposure,Outcome = data$Cirrhosis_cat,Time1=data$Cirrhosis_agestart,Time2=data$Cirrhosis_ageend,mode = mode)[1:2,]
+  Diverticulum<-cox_model(data=data,Exposure=Exposure,Outcome = data$Diverticulum_cat,Time1=data$Diverticulum_agestart,Time2=data$Diverticulum_ageend,mode = mode)[1:2,]
+  Cholangitis<-cox_model(data=data,Exposure=Exposure,Outcome = data$Cholangitis_cat,Time1=data$Cholangitis_agestart,Time2=data$Cholangitis_ageend,mode = mode)[1:2,]
+  Cholecystitis<-cox_model(data=data,Exposure=Exposure,Outcome = data$Cholecystitis_cat,Time1=data$Cholecystitis_agestart,Time2=data$Cholecystitis_ageend,mode = mode)[1:2,]
+  PancreaChron<-cox_model(data=data,Exposure=Exposure,Outcome = data$PancreaChron_cat,Time1=data$PancreaChron_agestart,Time2=data$PancreaChron_ageend,mode = mode)[1:2,]
+  PancreaAcute<-cox_model(data=data,Exposure=Exposure,Outcome = data$PancreaAcute_cat,Time1=data$PancreaAcute_agestart,Time2=data$PancreaAcute_ageend,mode = mode)[1:2,]
+  UC<-cox_model(data=data,Exposure=Exposure,Outcome = data$UC_cat,Time1=data$UC_agestart,Time2=data$UC_ageend,mode = mode)[1:2,]
+  CD<-cox_model(data=data,Exposure=Exposure,Outcome = data$CD_cat,Time1=data$CD_agestart,Time2=data$CD_ageend,mode = mode)[1:2,]
+  IBS<-cox_model(data=data,Exposure=Exposure,Outcome = data$IBS_cat,Time1=data$IBS_agestart,Time2=data$IBS_ageend,mode = mode)[1:2,]
+  Celiac<-cox_model(data=data,Exposure=Exposure,Outcome = data$Celiac_cat,Time1=data$Celiac_agestart,Time2=data$Celiac_ageend,mode = mode)[1:2,]
+  Gastritis<-cox_model(data=data,Exposure=Exposure,Outcome = data$Gastritis_cat,Time1=data$Gastritis_agestart,Time2=data$Gastritis_ageend,mode = mode)[1:2,]
+  Ulcer<-cox_model(data=data,Exposure=Exposure,Outcome = data$Ulcer_cat,Time1=data$Ulcer_agestart,Time2=data$Ulcer_ageend,mode = mode)[1:2,]
+  Barrett<-cox_model(data=data,Exposure=Exposure,Outcome = data$Barrett_cat,Time1=data$Barrett_agestart,Time2=data$Barrett_ageend,mode = mode)[1:2,]
+  GERD<-cox_model(data=data,Exposure=Exposure,Outcome = data$GERD_cat,Time1=data$GERD_agestart,Time2=data$GERD_ageend,mode = mode)[1:2,]
+  Esopha<-cox_model(data=data,Exposure=Exposure,Outcome = data$Esopha_cat,Time1=data$Esopha_agestart,Time2=data$Esopha_ageend,mode = mode)[1:2,]
+  Gastric<-cox_model(data=data,Exposure=Exposure,Outcome = data$Gastric_cat,Time1=data$Gastric_agestart,Time2=data$Gastric_ageend,mode = mode)[1:2,]
+  IntestSmall<-cox_model(data=data,Exposure=Exposure,Outcome = data$IntestSmall_cat,Time1=data$IntestSmall_agestart,Time2=data$IntestSmall_ageend,mode = mode)[1:2,]
+  CRC<-cox_model(data=data,Exposure=Exposure,Outcome = data$CRC_cat,Time1=data$CRC_agestart,Time2=data$CRC_agestart,Time2=data$CRC_ageend,mode = mode)[1:2,]
+  Pancrea<-cox_model(data=data,Exposure=Exposure,Outcome = data$Pancrea_cat,Time1=data$Pancrea_agestart,Time2=data$Pancrea_agestart,Time2=data$Pancrea_ageend,mode = mode)[1:2,]
+  Gallbladder<-cox_model(data=data,Exposure=Exposure,Outcome = data$Gallbladder_cat,Time1=data$Gallbladder_agestart,Time2=data$Gallbladder_ageend,mode = mode)[1:2,]
+  NAFLD<-cox_model(data=data,Exposure=Exposure,Outcome = data$NAFLD_cat,Time1=data$NAFLD_agestart,Time2=data$NAFLD_ageend,mode = mode)[1:2,]
+  HCC<-cox_model(data=data,Exposure=Exposure,Outcome = data$HCC_cat,Time1=data$HCC_agestart,Time2=data$HCC_ageend,mode = mode)[1:2,]
+  Cholelithiasis<-cox_model(data=data,Exposure=Exposure,Outcome = data$Cholelithiasis_cat,Time1=data$Cholelithiasis_agestart,Time2=data$Cholelithiasis_ageend,mode = mode)[1:2,]
+  
+  Model<-rbind.data.frame(Barrett,GERD,Esopha,
+                          Gastritis,Celiac,CD,UC,Diverticulum,IBS,Ulcer,Gastric,IntestSmall,CRC, 
+                          PancreaAcute,PancreaChron,Pancrea,
+                          Cholangitis,Cholecystitis,Cholelithiasis,Gallbladder ,
+                          NAFLD,Cirrhosis, HCC,Append)
+  rownames(Model)<-c('Barrett2','Barrett3',
+                     'GERD2','GERD3',
+                     'Esopha2','Esopha3',
+                     'Gastritis2','Gastritis3',
+                     'Celiac2','Celiac3',
+                     'CD2','CD3',
+                     'UC2','UC3',
+                     'Diverticulum2','Diverticulum3',
+                     'IBS2','IBS3',
+                     'Ulcer2','Ulcer3',
+                     'Gastric1','Gastric2',
+                     'IntestSmall1','IntestSmall2',
+                     'CRC1','CRC2',
+                     'PancreaAcute2','PancreaAcute3',
+                     'PancreaChron2','PancreaChron3',
+                     'Pancrea1','Pancrea2',
+                     'Cholangitis2','Cholangitis3',
+                     'Cholecystitis2','Cholecystitis3',
+                     'Cholelithiasis2','Cholelithiasis3',
+                     'Gallbladder1','Gallbladder2',
+                     'NAFLD1','NAFLD2',
+                     'Cirrhosis2','Cirrhosis3',
+                     'HCC1','HCC2',
+                     'Append2','Append3'
+  )
+  Model<-Adjust(Model)
+  return(as.data.frame(Model))
+}
+GI_cox_con <-function(data=Null,mode=mode,Exposure=Exposure){
+  Append<-cox_model(data=data,Exposure=Exposure,Outcome = data$Append_cat,Time1=data$Append_agestart,Time2=data$Append_ageend,mode = mode)[c(1:1),]
+  Cirrhosis<-cox_model(data=data,Exposure=Exposure,Outcome = data$Cirrhosis_cat,Time1=data$Cirrhosis_agestart,Time2=data$Cirrhosis_ageend,mode = mode)[c(1:1),]
+  Diverticulum<-cox_model(data=data,Exposure=Exposure,Outcome = data$Diverticulum_cat,Time1=data$Diverticulum_agestart,Time2=data$Diverticulum_ageend,mode = mode)[c(1:1),]
+  Cholangitis<-cox_model(data=data,Exposure=Exposure,Outcome = data$Cholangitis_cat,Time1=data$Cholangitis_agestart,Time2=data$Cholangitis_ageend,mode = mode)[c(1:1),]
+  Cholecystitis<-cox_model(data=data,Exposure=Exposure,Outcome = data$Cholecystitis_cat,Time1=data$Cholecystitis_agestart,Time2=data$Cholecystitis_ageend,mode = mode)[c(1:1),]
+  PancreaChron<-cox_model(data=data,Exposure=Exposure,Outcome = data$PancreaChron_cat,Time1=data$PancreaChron_agestart,Time2=data$PancreaChron_ageend,mode = mode)[c(1:1),]
+  PancreaAcute<-cox_model(data=data,Exposure=Exposure,Outcome = data$PancreaAcute_cat,Time1=data$PancreaAcute_agestart,Time2=data$PancreaAcute_ageend,mode = mode)[c(1:1),]
+  UC<-cox_model(data=data,Exposure=Exposure,Outcome = data$UC_cat,Time1=data$UC_agestart,Time2=data$UC_ageend,mode = mode)[c(1:1),]
+  CD<-cox_model(data=data,Exposure=Exposure,Outcome = data$CD_cat,Time1=data$CD_agestart,Time2=data$CD_ageend,mode = mode)[c(1:1),]
+  IBS<-cox_model(data=data,Exposure=Exposure,Outcome = data$IBS_cat,Time1=data$IBS_agestart,Time2=data$IBS_ageend,mode = mode)[c(1:1),]
+  Celiac<-cox_model(data=data,Exposure=Exposure,Outcome = data$Celiac_cat,Time1=data$Celiac_agestart,Time2=data$Celiac_ageend,mode = mode)[c(1:1),]
+  Gastritis<-cox_model(data=data,Exposure=Exposure,Outcome = data$Gastritis_cat,Time1=data$Gastritis_agestart,Time2=data$Gastritis_ageend,mode = mode)[c(1:1),]
+  Ulcer<-cox_model(data=data,Exposure=Exposure,Outcome = data$Ulcer_cat,Time1=data$Ulcer_agestart,Time2=data$Ulcer_ageend,mode = mode)[c(1:1),]
+  Barrett<-cox_model(data=data,Exposure=Exposure,Outcome = data$Barrett_cat,Time1=data$Barrett_agestart,Time2=data$Barrett_ageend,mode = mode)[c(1:1),]
+  GERD<-cox_model(data=data,Exposure=Exposure,Outcome = data$GERD_cat,Time1=data$GERD_agestart,Time2=data$GERD_ageend,mode = mode)[c(1:1),]
+  Esopha<-cox_model(data=data,Exposure=Exposure,Outcome = data$Esopha_cat,Time1=data$Esopha_agestart,Time2=data$Esopha_ageend,mode = mode)[c(1:1),]
+  Gastric<-cox_model(data=data,Exposure=Exposure,Outcome = data$Gastric_cat,Time1=data$Gastric_agestart,Time2=data$Gastric_ageend,mode = mode)[c(1:1),]
+  IntestSmall<-cox_model(data=data,Exposure=Exposure,Outcome = data$IntestSmall_cat,Time1=data$IntestSmall_agestart,Time2=data$IntestSmall_ageend,mode = mode)[c(1:1),]
+  CRC<-cox_model(data=data,Exposure=Exposure,Outcome = data$CRC_cat,Time1=data$CRC_agestart,Time2=data$CRC_agestart,Time2=data$CRC_ageend,mode = mode)[c(1:1),]
+  Pancrea<-cox_model(data=data,Exposure=Exposure,Outcome = data$Pancrea_cat,Time1=data$Pancrea_agestart,Time2=data$Pancrea_agestart,Time2=data$Pancrea_ageend,mode = mode)[c(1:1),]
+  Gallbladder<-cox_model(data=data,Exposure=Exposure,Outcome = data$Gallbladder_cat,Time1=data$Gallbladder_agestart,Time2=data$Gallbladder_ageend,mode = mode)[c(1:1),]
+  NAFLD<-cox_model(data=data,Exposure=Exposure,Outcome = data$NAFLD_cat,Time1=data$NAFLD_agestart,Time2=data$NAFLD_ageend,mode = mode)[c(1:1),]
+  HCC<-cox_model(data=data,Exposure=Exposure,Outcome = data$HCC_cat,Time1=data$HCC_agestart,Time2=data$HCC_ageend,mode = mode)[c(1:1),]
+  Cholelithiasis<-cox_model(data=data,Exposure=Exposure,Outcome = data$Cholelithiasis_cat,Time1=data$Cholelithiasis_agestart,Time2=data$Cholelithiasis_ageend,mode = mode)[c(1:1),]
+  
+  Model<-rbind.data.frame(Barrett,GERD,Esopha,
+                          Gastritis,Celiac,CD,UC,Diverticulum,IBS,Ulcer,Gastric,IntestSmall,CRC, 
+                          PancreaAcute,PancreaChron,Pancrea,
+                          Cholangitis,Cholecystitis,Cholelithiasis,Gallbladder ,
+                          NAFLD,Cirrhosis, HCC,Append)
+  rownames(Model)<-c('Barrett',
+                     'GERD',
+                     'Esopha',
+                     'Gastritis',
+                     'Celiac',
+                     'CD',
+                     'UC',
+                     'Diverticulum',
+                     'IBS',
+                     'Ulcer',
+                     'Gastric',
+                     'IntestSmall',
+                     'CRC',
+                     'PancreaAcute',
+                     'PancreaChron',
+                     'Pancrea',
+                     'Cholangitis',
+                     'Cholecystitis',
+                     'Cholelithiasis',
+                     'Gallbladder',
+                     'NAFLD',
+                     'Cirrhosis',
+                     'HCC',
+                     'Append'
+  )
+  Model<-Adjust(Model)
+  return(as.data.frame(Model))
+}
+
+#Primary analysis
+Model1_grip<- GI_cox(Grip_inc0,mode=1,Exposure = Grip_inc0$gripCat)
+Model1_muscle<- GI_cox(Grip_inc0,mode=1,Exposure = Grip_inc0$muscleCat)
+
+Model2_grip<- GI_cox(Grip_inc0,mode=2,Exposure = Grip_inc0$gripCat)
+Model2_muscle<- GI_cox(Grip_inc0,mode=2,Exposure = Grip_inc0$muscleCat)
+Model_main<-cbind(Model1_grip,Model1_muscle,Model2_grip,Model2_muscle)
+colnames(Model_main)<-c("Model1_grip",'Q','Model1_muscle','Q','Model2_grip','Q','Model2_muscle','Q')
+
+#write.csv(Model_main,'Model_main.csv')
+Model1_grip_con<- GI_cox_con(Grip_inc0,mode=1,Exposure = Grip_inc0$grip_sd)
+Model1_muscle_con<- GI_cox_con(Grip_inc0,mode=1,Exposure = Grip_inc0$muscle_sd)
+Model2_grip_con<- GI_cox_con(Grip_inc0,mode=2,Exposure = Grip_inc0$grip_sd)
+Model2_muscle_con<- GI_cox_con(Grip_inc0,mode=2,Exposure = Grip_inc0$muscle_sd)
+
+Model_main_con<-cbind(Model1_grip_con,Model1_muscle_con,Model2_grip_con,Model2_muscle_con)
+colnames(Model_main_con)<-c("Model1_grip_con",'Q','Model1_muscle_con','Q','Model2_grip_con','Q','Model2_muscle_con','Q')
+#write.csv(Model_main_con,'Model_main_con.csv')
+
+
+#secondary
+#muscle_bmi_sd: SMM/BMI, sex-specific standardized
+#muscle_f_sd: SMM/whole fat mass, sex-specific standardized
+
+Model_musclebmi_con<- GI_cox_con(Grip_inc0,mode=2,Exposure = Grip_inc0$muscle_bmi_sd)
+Model_musclef_con<- GI_cox_con(Grip_inc0,mode=2,Exposure = Grip_inc0$muscle_f_sd)
