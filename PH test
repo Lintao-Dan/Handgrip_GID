@@ -1,0 +1,69 @@
+#PH assumption
+PH_model <- function(data,Time1,Time2,Outcome,Exposure){
+  model <- cox.zph(coxph(Surv(Time1,Time2,Outcome)~Exposure,data=data))
+  model <-model[["table"]]
+  model<-as.data.frame(model)
+  return(model)
+}
+GI_PH <-function(data=Null,Exposure=Exposure){
+  Append<-PH_model(data=data,Exposure=Exposure,Outcome = data$Append_cat,Time1=data$Append_agestart,Time2=data$Append_ageend)
+  Cirrhosis<-PH_model(data=data,Exposure=Exposure,Outcome = data$Cirrhosis_cat,Time1=data$Cirrhosis_agestart,Time2=data$Cirrhosis_ageend)
+  Diverticulum<-PH_model(data=data,Exposure=Exposure,Outcome = data$Diverticulum_cat,Time1=data$Diverticulum_agestart,Time2=data$Diverticulum_ageend)
+  Cholangitis<-PH_model(data=data,Exposure=Exposure,Outcome = data$Cholangitis_cat,Time1=data$Cholangitis_agestart,Time2=data$Cholangitis_ageend)
+  Cholecystitis<-PH_model(data=data,Exposure=Exposure,Outcome = data$Cholecystitis_cat,Time1=data$Cholecystitis_agestart,Time2=data$Cholecystitis_ageend)
+  PancreaChron<-PH_model(data=data,Exposure=Exposure,Outcome = data$PancreaChron_cat,Time1=data$PancreaChron_agestart,Time2=data$PancreaChron_ageend)
+  PancreaAcute<-PH_model(data=data,Exposure=Exposure,Outcome = data$PancreaAcute_cat,Time1=data$PancreaAcute_agestart,Time2=data$PancreaAcute_ageend)
+  UC<-PH_model(data=data,Exposure=Exposure,Outcome = data$UC_cat,Time1=data$UC_agestart,Time2=data$UC_ageend)
+  CD<-PH_model(data=data,Exposure=Exposure,Outcome = data$CD_cat,Time1=data$CD_agestart,Time2=data$CD_ageend)
+  IBS<-PH_model(data=data,Exposure=Exposure,Outcome = data$IBS_cat,Time1=data$IBS_agestart,Time2=data$IBS_ageend)
+  Celiac<-PH_model(data=data,Exposure=Exposure,Outcome = data$Celiac_cat,Time1=data$Celiac_agestart,Time2=data$Celiac_ageend)
+  Gastritis<-PH_model(data=data,Exposure=Exposure,Outcome = data$Gastritis_cat,Time1=data$Gastritis_agestart,Time2=data$Gastritis_ageend)
+  Ulcer<-PH_model(data=data,Exposure=Exposure,Outcome = data$Ulcer_cat,Time1=data$Ulcer_agestart,Time2=data$Ulcer_ageend)
+  Barrett<-PH_model(data=data,Exposure=Exposure,Outcome = data$Barrett_cat,Time1=data$Barrett_agestart,Time2=data$Barrett_ageend)
+  GERD<-PH_model(data=data,Exposure=Exposure,Outcome = data$GERD_cat,Time1=data$GERD_agestart,Time2=data$GERD_ageend)
+  Esopha<-PH_model(data=data,Exposure=Exposure,Outcome = data$Esopha_cat,Time1=data$Esopha_agestart,Time2=data$Esopha_ageend)
+  Gastric<-PH_model(data=data,Exposure=Exposure,Outcome = data$Gastric_cat,Time1=data$Gastric_agestart,Time2=data$Gastric_ageend)
+  IntestSmall<-PH_model(data=data,Exposure=Exposure,Outcome = data$IntestSmall_cat,Time1=data$IntestSmall_agestart,Time2=data$IntestSmall_ageend)
+  CRC<-PH_model(data=data,Exposure=Exposure,Outcome = data$CRC_cat,Time1=data$CRC_agestart,Time2=data$CRC_agestart,Time2=data$CRC_ageend)
+  Pancrea<-PH_model(data=data,Exposure=Exposure,Outcome = data$Pancrea_cat,Time1=data$Pancrea_agestart,Time2=data$Pancrea_agestart,Time2=data$Pancrea_ageend)
+  Gallbladder<-PH_model(data=data,Exposure=Exposure,Outcome = data$Gallbladder_cat,Time1=data$Gallbladder_agestart,Time2=data$Gallbladder_ageend)
+  NAFLD<-PH_model(data=data,Exposure=Exposure,Outcome = data$NAFLD_cat,Time1=data$NAFLD_agestart,Time2=data$NAFLD_ageend)
+  HCC<-PH_model(data=data,Exposure=Exposure,Outcome = data$HCC_cat,Time1=data$HCC_agestart,Time2=data$HCC_ageend)
+  Cholelithiasis<-PH_model(data=data,Exposure=Exposure,Outcome = data$Cholelithiasis_cat,Time1=data$Cholelithiasis_agestart,Time2=data$Cholelithiasis_ageend)
+  Model<-rbind.data.frame(Barrett,GERD,Esopha,
+                          Gastritis,Celiac,CD,UC,Diverticulum,IBS,Ulcer,Gastric,IntestSmall,CRC,
+                          PancreaAcute,PancreaChron,Pancrea,
+                          Cholangitis,Cholecystitis,Cholelithiasis,Gallbladder ,
+                          NAFLD,Cirrhosis, HCC,Append)
+  rownames(Model)<-c('Barrett2','Barrett3',
+                     'GERD2','GERD3',
+                     'Esopha2','Esopha3',
+                     'Gastritis2','Gastritis3',
+                     'Celiac2','Celiac3',
+                     'CD2','CD3',
+                     'UC2','UC3',
+                     'Diverticulum2','Diverticulum3',
+                     'IBS2','IBS3',
+                     'Ulcer2','Ulcer3',
+                     'Gastric1','Gastric2',
+                     'IntestSmall1','IntestSmall2',
+                     'CRC1','CRC2',
+                     'PancreaAcute2','PancreaAcute3',
+                     'PancreaChron2','PancreaChron3',
+                     'Pancrea1','Pancrea2',
+                     'Cholangitis2','Cholangitis3',
+                     'Cholecystitis2','Cholecystitis3',
+                     'Cholelithiasis2','Cholelithiasis3',
+                     'Gallbladder1','Gallbladder2',
+                     'NAFLD1','NAFLD2',
+                     'Cirrhosis2','Cirrhosis3',
+                     'HCC1','HCC2',
+                     'Append2','Append3'
+  )
+  return(as.data.frame(Model))
+}
+PH_grip<- GI_PH(Grip_inc0,Exposure = Grip_inc0$gripCat)
+PH_muscle<- GI_PH(Grip_inc0,Exposure = Grip_inc0$muscleCat)
+PH_muscle$Q_value<-p.adjust(PH_muscle$p,method = 'BH')
+PH_grip$Q_value<-p.adjust(PH_grip$p,method = 'BH')
+#Grip_inc0 is the data with imputed variables
