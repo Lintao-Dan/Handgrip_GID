@@ -1,0 +1,93 @@
+library(AF)
+library(drgee)
+library(stdReg)
+library(ivtools)
+Grip_inc0$gripT<-ifelse(Grip_inc0$gripCat=='Q1',1,0)
+Grip_inc0$muscleT<-ifelse(Grip_inc0$muscleCat=='Q1',1,0)
+
+sex<-Grip_inc0$Sex;AgeRec<-Grip_inc0$AgeRec;EthCat<-Grip_inc0$EthCat;TDI<-Grip_inc0$TDI;AlcCat<-Grip_inc0$AlcCat;
+PACat<-Grip_inc0$PACat;EverSmokeCat<-Grip_inc0$EverSmokeCat;cci_index<-Grip_inc0$cci_index;
+EduCat<-Grip_inc0$EduCat;Diet<-Grip_inc0$Diet
+gripT<-Grip_inc0$gripT;muscleT<-Grip_inc0$muscleT;muscleL<-Grip_inc0$muscleL;gripL<-Grip_inc0$gripL
+AF <- function(a){
+  b<-a+24
+  outcome<-Grip_inc0[,a]
+  cox_time<-Grip_inc0[,b]
+  time<-max(cox_time)
+  data<-data.frame(gripT,muscleT,sex,AgeRec,EthCat,TDI,AlcCat,PACat,EverSmokeCat,cci_index,EduCat,Diet)
+  data<-cbind(data,outcome)
+  data<-cbind(data,cox_time)
+  fit_gripT<-coxph(formula = Surv(cox_time, outcome)~gripT+sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat+Diet, data = data, ties="breslow")
+  fit_muscleT<-coxph(formula = Surv(cox_time, outcome)~muscleT+sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat+Diet, data = data, ties="breslow")
+  AF_gripT <- AFcoxph(fit_gripT, data=data, exposure='gripT',times = time)
+  AF_muscleT <- AFcoxph(fit_muscleT, data=data, exposure='muscleT',times = time)
+   
+  gripT<-data.frame(AF_gripT[["AF.est"]],sqrt(AF_gripT[["AF.var"]]))
+  colnames(gripT)<-c('AF','SD')
+  muscleT<-data.frame(AF_muscleT[["AF.est"]],sqrt(AF_muscleT[["AF.var"]]))
+  colnames(muscleT)<-c('AF','SD')
+   AF_value<-rbind(gripT,muscleT)
+  rownames(AF_value)<-c('lowest tertile grip','lowest tertile muscle mass')
+  AF_value$LCL<-AF_value$AF-1.96*AF_value$SD
+  AF_value$UCL<-AF_value$AF+1.96*AF_value$SD
+  return(AF_value)
+}
+
+AF_Barrett<-AF(a=2)
+AF_Barrett
+AF_GERD<-AF(3)
+AF_GERD
+AF_Esopha<-AF(4)
+AF_Esopha
+AF_Gastritis<-AF(5)
+AF_Gastritis
+AF_Celiac<-AF(6)
+AF_Celiac
+AF_CD<-AF(7)
+AF_CD
+AF_UC<-AF(8)
+AF_UC
+AF_Diverticulum<-AF(9)
+AF_Diverticulum
+
+AF_IBS<-AF(10)
+AF_IBS
+AF_Ulcer<-AF(11)
+AF_Ulcer
+AF_Gastric<-AF(12)
+AF_Gastric
+AF_IntestSmall<-AF(13)
+AF_IntestSmall
+AF_CRC<-AF(14)
+AF_CRC
+
+AF_PancreaAcute<-AF(15)
+AF_PancreaAcute
+AF_PancreaChron<-AF(16)
+AF_PancreaChron
+AF_Pancrea<-AF(17)
+AF_Pancrea
+
+AF_Cholangitis<-AF(18)
+AF_Cholangitis
+AF_Cholecystitis<-AF(19)
+AF_Cholecystitis
+AF_Cholelithiasis<-AF(20)
+AF_Cholelithiasis
+AF_Gallbladder<-AF(21)
+AF_Gallbladder
+AF_NAFLD<-AF(22)
+AF_NAFLD
+AF_Cirrhosis<-AF(23)
+AF_Cirrhosis
+AF_HCC<-AF(24)
+AF_HCC
+AF_Append<-AF(25)
+AF_Append
+
+AF<-rbind(AF_Barrett,AF_GERD,AF_Esopha,
+          AF_Gastritis,AF_Celiac,AF_CD,AF_UC,AF_Diverticulum,AF_IBS,AF_Ulcer,AF_Gastric,AF_IntestSmall,AF_CRC, 
+          AF_PancreaAcute,AF_PancreaChron,AF_Pancrea,
+          AF_Cholangitis,AF_Cholecystitis,AF_Cholelithiasis,AF_Gallbladder ,
+          AF_NAFLD,AF_Cirrhosis, AF_HCC,AF_Append)
+write.csv(AF,'AF.csv')
