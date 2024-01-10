@@ -1,0 +1,230 @@
+#subgroup
+median(Grip_inc0$AgeRec)
+Grip_inc0$AgeGroup <- ifelse(Grip_inc0$AgeRec<60,'<60','>=60')
+Grip_inc_60 <-Grip_inc0[which(Grip_inc0$AgeRec <60),]
+Grip_inc_61 <-Grip_inc0[which(Grip_inc0$AgeRec >= 60),]
+#sex
+Grip_inc_female <-Grip_inc0[which(Grip_inc0$Sex ==0),]
+Grip_inc_male <-Grip_inc0[which(Grip_inc0$Sex == 1),]
+
+#drink
+#describe(Grip_inc0$CurrentDrinkCat)
+Grip_inc_nodrink <-Grip_inc0[which(Grip_inc0$AlcCat==0),]
+Grip_inc_yesdrink <-Grip_inc0[(Grip_inc0$AlcCat==1),]
+#smoke
+#describe(Grip_inc0$EverSmokeCat)
+Grip_inc_nosmoke <- Grip_inc0[which(Grip_inc0$EverSmokeCat==0),]
+Grip_inc_yessmoke <- Grip_inc0[which(Grip_inc0$EverSmokeCat==1),]
+#Diet
+Grip_inc_noDiet <- Grip_inc0[which(Grip_inc0$Diet==0),]
+Grip_inc_yesDiet <- Grip_inc0[which(Grip_inc0$Diet==1),]
+
+P_interaction_model <- function(data,Time1,Time2,Outcome,Exposure, mode=1){
+  if (mode == 0){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure*AgeGroup+Sex+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat+Diet,data=data)
+    model <- anova(model)
+    model <- model[c(13:13),]
+    
+  }
+  else if (mode == 1){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure*Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat+Diet,data=data)
+    model <- anova(model)
+    model <- model[c(13:13),]
+    
+  }
+  else if (mode == 2){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure*AlcCat+Sex+AgeRec+EthCat+TDI+PACat+EverSmokeCat+cci_index+EduCat+Diet
+                   ,data=data)
+    model <- anova(model)
+    model <- model[c(13:13),]
+  }
+  else if (mode == 3){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure*EverSmokeCat+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+cci_index+EduCat+Diet
+                   ,data=data)
+    model <- anova(model)
+    model <- model[c(13:13),]
+  }
+  else if (mode == 4){
+    model <- coxph(Surv(Time1,Time2,Outcome)~Exposure*Diet+Sex+AgeRec+EthCat+TDI+AlcCat+PACat+EverSmokeCat+cci_index+EduCat
+                   ,data=data)
+    model <- anova(model)
+    model <- model[c(13:13),]
+  }
+  
+  
+  
+  else{
+    model = NULL
+    print("Warning: Model not find")
+  }
+  return(model)
+}
+
+
+Interaction_GI <-function(data=Null,mode=mode,Exposure=Exposure){
+  Append<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Append_cat,Time1=data$Append_agestart,Time2=data$Append_ageend,mode = mode)
+  Cirrhosis<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Cirrhosis_cat,Time1=data$Cirrhosis_agestart,Time2=data$Cirrhosis_ageend,mode = mode)
+  Diverticulum<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Diverticulum_cat,Time1=data$Diverticulum_agestart,Time2=data$Diverticulum_ageend,mode = mode)
+  Cholangitis<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Cholangitis_cat,Time1=data$Cholangitis_agestart,Time2=data$Cholangitis_ageend,mode = mode)
+  Cholecystitis<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Cholecystitis_cat,Time1=data$Cholecystitis_agestart,Time2=data$Cholecystitis_ageend,mode = mode)
+  PancreaChron<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$PancreaChron_cat,Time1=data$PancreaChron_agestart,Time2=data$PancreaChron_ageend,mode = mode)
+  PancreaAcute<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$PancreaAcute_cat,Time1=data$PancreaAcute_agestart,Time2=data$PancreaAcute_ageend,mode = mode)
+  UC<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$UC_cat,Time1=data$UC_agestart,Time2=data$UC_ageend,mode = mode)
+  CD<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$CD_cat,Time1=data$CD_agestart,Time2=data$CD_ageend,mode = mode)
+  IBS<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$IBS_cat,Time1=data$IBS_agestart,Time2=data$IBS_ageend,mode = mode)
+  Celiac<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Celiac_cat,Time1=data$Celiac_agestart,Time2=data$Celiac_ageend,mode = mode)
+  Gastritis<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Gastritis_cat,Time1=data$Gastritis_agestart,Time2=data$Gastritis_ageend,mode = mode)
+  Ulcer<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Ulcer_cat,Time1=data$Ulcer_agestart,Time2=data$Ulcer_ageend,mode = mode)
+  Barrett<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Barrett_cat,Time1=data$Barrett_agestart,Time2=data$Barrett_ageend,mode = mode)
+  GERD<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$GERD_cat,Time1=data$GERD_agestart,Time2=data$GERD_ageend,mode = mode)
+  Esopha<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Esopha_cat,Time1=data$Esopha_agestart,Time2=data$Esopha_ageend,mode = mode)
+  Gastric<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Gastric_cat,Time1=data$Gastric_agestart,Time2=data$Gastric_ageend,mode = mode)
+  IntestSmall<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$IntestSmall_cat,Time1=data$IntestSmall_agestart,Time2=data$IntestSmall_ageend,mode = mode)
+  CRC<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$CRC_cat,Time1=data$CRC_agestart,Time2=data$CRC_agestart,Time2=data$CRC_ageend,mode = mode)
+  Pancrea<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Pancrea_cat,Time1=data$Pancrea_agestart,Time2=data$Pancrea_agestart,Time2=data$Pancrea_ageend,mode = mode)
+  Gallbladder<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Gallbladder_cat,Time1=data$Gallbladder_agestart,Time2=data$Gallbladder_ageend,mode = mode)
+  NAFLD<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$NAFLD_cat,Time1=data$NAFLD_agestart,Time2=data$NAFLD_ageend,mode = mode)
+  HCC<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$HCC_cat,Time1=data$HCC_agestart,Time2=data$HCC_ageend,mode = mode)
+  Cholelithiasis<-P_interaction_model(data=data,Exposure=Exposure,Outcome = data$Cholelithiasis_cat,Time1=data$Cholelithiasis_agestart,Time2=data$Cholelithiasis_ageend,mode = mode)
+  Model<-rbind.data.frame(Barrett,GERD,Esopha,
+                          Gastritis,Celiac,CD,UC,Diverticulum,IBS,Ulcer,Gastric,IntestSmall,CRC, 
+                          PancreaAcute,PancreaChron,Pancrea,
+                          Cholangitis,Cholecystitis,Cholelithiasis,Gallbladder ,
+                          NAFLD,Cirrhosis, HCC,Append)
+  rownames(Model)<-c('Barrett',
+                     'GERD',
+                     'Esopha',
+                     'Gastritis',
+                     'Celiac',
+                     'CD',
+                     'UC',
+                     'Diverticulum',
+                     'IBS',
+                     'Ulcer',
+                     'Gastric',
+                     'IntestSmall',
+                     'CRC',
+                     'PancreaAcute',
+                     'PancreaChron',
+                     'Pancrea',
+                     
+                     'Cholangitis',
+                     'Cholecystitis',
+                     'Cholelithiasis',
+                     'Gallbladder',
+                     'NAFLD',
+                     'Cirrhosis',
+                     'HCC',
+                     'Append'
+  )
+  return(as.data.frame(Model))
+}
+
+
+Model_grip_age_interaction <- Interaction_GI(Grip_inc0,mode = 0,Exposure =Grip_inc0$grip_sd )
+Model_grip_sex_interaction <- Interaction_GI(Grip_inc0,mode = 1,Exposure =Grip_inc0$grip_sd )
+Model_grip_alcohol_interaction <- Interaction_GI(Grip_inc0,mode = 2,Exposure =Grip_inc0$grip_sd )
+Model_grip_smoke_interaction <- Interaction_GI(Grip_inc0,mode = 3,Exposure =Grip_inc0$grip_sd )
+Model_grip_diet_interaction <- Interaction_GI(Grip_inc0,mode = 4,Exposure =Grip_inc0$grip_sd )
+Model_grip_age_interaction$Q<-p.adjust(Model_grip_age_interaction$`Pr(>|Chi|)`,method = 'BH')
+Model_grip_sex_interaction$Q<-p.adjust(Model_grip_sex_interaction$`Pr(>|Chi|)`,method = 'BH')
+Model_grip_alcohol_interaction$Q<-p.adjust(Model_grip_alcohol_interaction$`Pr(>|Chi|)`,method = 'BH')
+Model_grip_smoke_interaction$Q<-p.adjust(Model_grip_smoke_interaction$`Pr(>|Chi|)`,method = 'BH')
+Model_grip_diet_interaction$Q<-p.adjust(Model_grip_diet_interaction$`Pr(>|Chi|)`,method = 'BH')
+Model_grip_interaction<-cbind(Model_grip_age_interaction,Model_grip_sex_interaction,Model_grip_alcohol_interaction,
+                              Model_grip_smoke_interaction,Model_grip_diet_interaction)
+write.csv(Model_grip_interaction,'inter_grip.csv')
+
+Model_muscle_age_interaction <- Interaction_GI(Grip_inc0,mode = 0,Exposure =Grip_inc0$muscle_sd )
+Model_muscle_sex_interaction <- Interaction_GI(Grip_inc0,mode = 1,Exposure =Grip_inc0$muscle_sd )
+Model_muscle_alcohol_interaction <- Interaction_GI(Grip_inc0,mode = 2,Exposure =Grip_inc0$muscle_sd )
+Model_muscle_smoke_interaction <- Interaction_GI(Grip_inc0,mode = 3,Exposure =Grip_inc0$muscle_sd )
+Model_muscle_diet_interaction <- Interaction_GI(Grip_inc0,mode = 4,Exposure =Grip_inc0$muscle_sd )
+Model_muscle_age_interaction$Q<-p.adjust(Model_muscle_age_interaction$`Pr(>|Chi|)`,method = 'BH')
+Model_muscle_sex_interaction$Q<-p.adjust(Model_muscle_sex_interaction$`Pr(>|Chi|)`,method = 'BH')
+Model_muscle_alcohol_interaction$Q<-p.adjust(Model_muscle_alcohol_interaction$`Pr(>|Chi|)`,method = 'BH')
+Model_muscle_smoke_interaction$Q<-p.adjust(Model_muscle_smoke_interaction$`Pr(>|Chi|)`,method = 'BH')
+Model_muscle_diet_interaction$Q<-p.adjust(Model_muscle_diet_interaction$`Pr(>|Chi|)`,method = 'BH')
+Model_muscle_interaction<-cbind(Model_muscle_age_interaction,Model_muscle_sex_interaction,Model_muscle_alcohol_interaction,
+                                Model_muscle_smoke_interaction,Model_muscle_diet_interaction)
+
+write.csv(Model_muscle_interaction,'inter_muscle.csv')
+
+##grip
+#age
+Model_grip_60<-GI_cox(Grip_inc_60,mode=3,Exposure = Grip_inc_60$grip_sd)
+Model_grip_61<-GI_cox(Grip_inc_61,mode=3,Exposure = Grip_inc_61$grip_sd)
+Model_grip_60_con<-GI_cox_con(Grip_inc_60,mode=3,Exposure = Grip_inc_60$grip_sd)
+Model_grip_61_con<-GI_cox_con(Grip_inc_61,mode=3,Exposure = Grip_inc_61$grip_sd)
+#sex
+Model_grip_female<-GI_cox(Grip_inc_female,mode=4,Exposure = Grip_inc_female$grip_sd)
+Model_grip_male<-GI_cox(Grip_inc_male,mode=4,Exposure = Grip_inc_male$grip_sd)
+Model_grip_female_con<-GI_cox_con(Grip_inc_female,mode=4,Exposure = Grip_inc_female$grip_sd)
+Model_grip_male_con<-GI_cox_con(Grip_inc_male,mode=4,Exposure = Grip_inc_male$grip_sd)
+
+
+#drinking
+Model_grip_nodrink<-GI_cox(Grip_inc_nodrink,mode=5,Exposure = Grip_inc_nodrink$grip_sd)
+Model_grip_yesdrink<-GI_cox(Grip_inc_yesdrink,mode=5,Exposure = Grip_inc_yesdrink$grip_sd)
+Model_grip_nodrink_con<-GI_cox_con(Grip_inc_nodrink,mode=5,Exposure = Grip_inc_nodrink$grip_sd)
+Model_grip_yesdrink_con<-GI_cox_con(Grip_inc_yesdrink,mode=5,Exposure = Grip_inc_yesdrink$grip_sd)
+
+#smoke
+Model_grip_nosmoke<-GI_cox(Grip_inc_nosmoke,mode=6,Exposure = Grip_inc_nosmoke$grip_sd)
+Model_grip_yessmoke<-GI_cox(Grip_inc_yessmoke,mode=6,Exposure = Grip_inc_yessmoke$grip_sd)
+Model_grip_nosmoke_con<-GI_cox_con(Grip_inc_nosmoke,mode=6,Exposure = Grip_inc_nosmoke$grip_sd)
+Model_grip_yessmoke_con<-GI_cox_con(Grip_inc_yessmoke,mode=6,Exposure = Grip_inc_yessmoke$grip_sd)
+
+#Diet
+Model_grip_noDiet<-GI_cox(Grip_inc_noDiet,mode=7,Exposure = Grip_inc_noDiet$grip_sd)
+Model_grip_yesDiet<-GI_cox(Grip_inc_yesDiet,mode=7,Exposure = Grip_inc_yesDiet$grip_sd)
+Model_grip_noDiet_con<-GI_cox_con(Grip_inc_noDiet,mode=7,Exposure = Grip_inc_noDiet$grip_sd)
+Model_grip_yesDiet_con<-GI_cox_con(Grip_inc_yesDiet,mode=7,Exposure = Grip_inc_yesDiet$grip_sd)
+
+#
+Model_grip_sub<-cbind(Model_grip_60,Model_grip_61,Model_grip_male,Model_grip_female,Model_grip_nodrink,Model_grip_yesdrink,Model_grip_nosmoke,Model_grip_yessmoke,
+                      Model_grip_noDiet,Model_grip_yesDiet)
+Model_grip_sub_con<-cbind(Model_grip_60_con,Model_grip_61_con,Model_grip_male_con,Model_grip_female_con,Model_grip_nodrink_con,Model_grip_yesdrink_con,Model_grip_nosmoke_con,Model_grip_yessmoke_con,
+                          Model_grip_noDiet_con,Model_grip_yesDiet_con)
+
+write.csv(Model_grip_sub,'Model_grip_sub.csv')
+write.csv(Model_grip_sub_con,'Model_grip_sub_con.csv')
+##muscle
+#age
+Model_muscle_60<-GI_cox(Grip_inc_60,mode=3,Exposure = Grip_inc_60$muscle_sd)
+Model_muscle_61<-GI_cox(Grip_inc_61,mode=3,Exposure = Grip_inc_61$muscle_sd)
+Model_muscle_60_con<-GI_cox_con(Grip_inc_60,mode=3,Exposure = Grip_inc_60$muscle_sd)
+Model_muscle_61_con<-GI_cox_con(Grip_inc_61,mode=3,Exposure = Grip_inc_61$muscle_sd)
+#sex
+Model_muscle_female<-GI_cox(Grip_inc_female,mode=4,Exposure = Grip_inc_female$muscle_sd)
+Model_muscle_male<-GI_cox(Grip_inc_male,mode=4,Exposure = Grip_inc_male$muscle_sd)
+Model_muscle_female_con<-GI_cox_con(Grip_inc_female,mode=4,Exposure = Grip_inc_female$muscle_sd)
+Model_muscle_male_con<-GI_cox_con(Grip_inc_male,mode=4,Exposure = Grip_inc_male$muscle_sd)
+
+
+#drinking
+Model_muscle_nodrink<-GI_cox(Grip_inc_nodrink,mode=5,Exposure = Grip_inc_nodrink$muscle_sd)
+Model_muscle_yesdrink<-GI_cox(Grip_inc_yesdrink,mode=5,Exposure = Grip_inc_yesdrink$muscle_sd)
+Model_muscle_nodrink_con<-GI_cox_con(Grip_inc_nodrink,mode=5,Exposure = Grip_inc_nodrink$muscle_sd)
+Model_muscle_yesdrink_con<-GI_cox_con(Grip_inc_yesdrink,mode=5,Exposure = Grip_inc_yesdrink$muscle_sd)
+
+#smoke
+Model_muscle_nosmoke<-GI_cox(Grip_inc_nosmoke,mode=6,Exposure = Grip_inc_nosmoke$muscle_sd)
+Model_muscle_yessmoke<-GI_cox(Grip_inc_yessmoke,mode=6,Exposure = Grip_inc_yessmoke$muscle_sd)
+Model_muscle_nosmoke_con<-GI_cox_con(Grip_inc_nosmoke,mode=6,Exposure = Grip_inc_nosmoke$muscle_sd)
+Model_muscle_yessmoke_con<-GI_cox_con(Grip_inc_yessmoke,mode=6,Exposure = Grip_inc_yessmoke$muscle_sd)
+
+#Diet
+Model_muscle_noDiet<-GI_cox(Grip_inc_noDiet,mode=7,Exposure = Grip_inc_noDiet$muscle_sd)
+Model_muscle_yesDiet<-GI_cox(Grip_inc_yesDiet,mode=7,Exposure = Grip_inc_yesDiet$muscle_sd)
+Model_muscle_noDiet_con<-GI_cox_con(Grip_inc_noDiet,mode=7,Exposure = Grip_inc_noDiet$muscle_sd)
+Model_muscle_yesDiet_con<-GI_cox_con(Grip_inc_yesDiet,mode=7,Exposure = Grip_inc_yesDiet$muscle_sd)
+
+#
+Model_muscle_sub<-cbind(Model_muscle_60,Model_muscle_61,Model_muscle_male,Model_muscle_female,Model_muscle_nodrink,Model_muscle_yesdrink,Model_muscle_nosmoke,Model_muscle_yessmoke,
+                        Model_muscle_noDiet,Model_muscle_yesDiet)
+Model_muscle_sub_con<-cbind(Model_muscle_60_con,Model_muscle_61_con,Model_muscle_male_con,Model_muscle_female_con,Model_muscle_nodrink_con,Model_muscle_yesdrink_con,Model_muscle_nosmoke_con,Model_muscle_yessmoke_con,
+                            Model_muscle_noDiet_con,Model_muscle_yesDiet_con)
+
+write.csv(Model_muscle_sub,'Model_muscle_sub.csv')
+write.csv(Model_muscle_sub_con,'Model_muscle_sub_con.csv')
